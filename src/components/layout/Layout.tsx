@@ -10,16 +10,12 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { 
   LayoutDashboard, 
   Package, 
-  Users, 
   Settings, 
   LogOut, 
-  Menu,
-  Bell,
-  Search
+  Menu
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -35,7 +31,6 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onPageChange }) 
   const navigationItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'products', label: 'Products', icon: Package },
-    { id: 'buyers', label: 'Buyers', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -65,24 +60,6 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onPageChange }) 
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2">
-              <Search className="h-4 w-4 text-muted-foreground mr-2" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-transparent border-none outline-none text-sm w-64"
-              />
-            </div>
-
-            {/* Notifications */}
-            <Button variant="ghost" size="sm" className="relative">
-              <Bell className="h-5 w-5" />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
-                3
-              </Badge>
-            </Button>
-
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

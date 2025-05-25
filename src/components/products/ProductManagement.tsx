@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Search, Eye, Edit, Trash2, Filter, Package } from 'lucide-react';
 import { Product, mockProducts, getStoredData, setStoredData, productCategories } from '../../services/mockData';
 import ProductForm from './ProductForm';
@@ -32,7 +33,6 @@ const ProductManagement: React.FC = () => {
 
   const handleSaveProduct = (productData: Omit<Product, 'id' | 'vendorId' | 'uploadDate'>) => {
     if (editingProduct) {
-      // Update existing product
       const updatedProducts = products.map(p => 
         p.id === editingProduct.id 
           ? { ...p, ...productData }
@@ -41,7 +41,6 @@ const ProductManagement: React.FC = () => {
       setProducts(updatedProducts);
       setStoredData('products', updatedProducts);
     } else {
-      // Add new product
       const newProduct: Product = {
         ...productData,
         id: Date.now().toString(),
@@ -63,6 +62,16 @@ const ProductManagement: React.FC = () => {
       setProducts(updatedProducts);
       setStoredData('products', updatedProducts);
     }
+  };
+
+  const handleStatusChange = (productId: string, newStatus: string) => {
+    const updatedProducts = products.map(p => 
+      p.id === productId 
+        ? { ...p, stockStatus: newStatus as 'in-stock' | 'low-stock' | 'out-of-stock' }
+        : p
+    );
+    setProducts(updatedProducts);
+    setStoredData('products', updatedProducts);
   };
 
   const getStockStatusColor = (status: string) => {
@@ -155,101 +164,120 @@ const ProductManagement: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <Card key={product.id} className="hover:shadow-lg transition-shadow">
-            <div className="aspect-video relative overflow-hidden rounded-t-lg">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-              <Badge 
-                className={`absolute top-2 right-2 ${getStockStatusColor(product.stockStatus)}`}
-              >
-                {product.stockStatus.replace('-', ' ')}
-              </Badge>
+      {/* Products Table */}
+      <Card>
+        <CardContent className="p-0">
+          {filteredProducts.length === 0 ? (
+            <div className="p-12 text-center">
+              <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <h3 className="text-lg font-semibold mb-2">No products found</h3>
+              <p className="text-muted-foreground mb-4">
+                {searchTerm || categoryFilter 
+                  ? "Try adjusting your search criteria" 
+                  : "Start by adding your first product to the catalog"
+                }
+              </p>
+              {!searchTerm && !categoryFilter && (
+                <Button onClick={() => setShowForm(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Product
+                </Button>
+              )}
             </div>
-            
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                <div>
-                  <h3 className="font-semibold text-lg">{product.name}</h3>
-                  <p className="text-sm text-muted-foreground">{product.subheading}</p>
-                </div>
-                
-                <div className="flex flex-wrap gap-1">
-                  {product.categories.slice(0, 2).map((category) => (
-                    <Badge key={category} variant="secondary" className="text-xs">
-                      {category}
-                    </Badge>
-                  ))}
-                  {product.categories.length > 2 && (
-                    <Badge variant="secondary" className="text-xs">
-                      +{product.categories.length - 2}
-                    </Badge>
-                  )}
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold">${product.price}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {new Date(product.uploadDate).toLocaleDateString()}
-                  </span>
-                </div>
-                
-                <div className="flex space-x-2">
-                  <Button size="sm" variant="outline" className="flex-1">
-                    <Eye className="h-4 w-4 mr-1" />
-                    View
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="flex-1"
-                    onClick={() => {
-                      setEditingProduct(product);
-                      setShowForm(true);
-                    }}
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => handleDeleteProduct(product.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {filteredProducts.length === 0 && (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <h3 className="text-lg font-semibold mb-2">No products found</h3>
-            <p className="text-muted-foreground mb-4">
-              {searchTerm || categoryFilter 
-                ? "Try adjusting your search criteria" 
-                : "Start by adding your first product to the catalog"
-              }
-            </p>
-            {!searchTerm && !categoryFilter && (
-              <Button onClick={() => setShowForm(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Product
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Categories</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Stock Status</TableHead>
+                  <TableHead>Upload Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-12 h-12 object-cover rounded-lg"
+                        />
+                        <div>
+                          <div className="font-medium">{product.name}</div>
+                          <div className="text-sm text-muted-foreground">{product.subheading}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {product.categories.slice(0, 2).map((category) => (
+                          <Badge key={category} variant="secondary" className="text-xs">
+                            {category}
+                          </Badge>
+                        ))}
+                        {product.categories.length > 2 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{product.categories.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">${product.price}</TableCell>
+                    <TableCell>
+                      <Select 
+                        value={product.stockStatus} 
+                        onValueChange={(value) => handleStatusChange(product.id, value)}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue>
+                            <Badge className={getStockStatusColor(product.stockStatus)}>
+                              {product.stockStatus.replace('-', ' ')}
+                            </Badge>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="in-stock">In Stock</SelectItem>
+                          <SelectItem value="low-stock">Low Stock</SelectItem>
+                          <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>{new Date(product.uploadDate).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-2">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setEditingProduct(product);
+                            setShowForm(true);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleDeleteProduct(product.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

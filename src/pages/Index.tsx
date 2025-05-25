@@ -5,10 +5,14 @@ import Auth from './Auth';
 import Layout from '../components/layout/Layout';
 import VendorDashboard from '../components/dashboard/VendorDashboard';
 import ProductManagement from '../components/products/ProductManagement';
+import VendorOnboarding from '../components/onboarding/VendorOnboarding';
 
 const Index = () => {
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [isOnboarded, setIsOnboarded] = useState(
+    localStorage.getItem('vendorOnboarded') === 'true'
+  );
 
   if (!user) {
     return <Auth />;
@@ -30,19 +34,21 @@ const Index = () => {
     );
   }
 
+  // Show onboarding if vendor hasn't completed it
+  if (user.userType === 'vendor' && !isOnboarded) {
+    return (
+      <VendorOnboarding 
+        onComplete={() => setIsOnboarded(true)}
+      />
+    );
+  }
+
   const renderPage = () => {
     switch (currentPage) {
       case 'dashboard':
         return <VendorDashboard />;
       case 'products':
         return <ProductManagement />;
-      case 'buyers':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold mb-4">Buyer Management</h2>
-            <p className="text-muted-foreground">Coming soon - Manage your buyer relationships</p>
-          </div>
-        );
       case 'settings':
         return (
           <div className="text-center py-12">
