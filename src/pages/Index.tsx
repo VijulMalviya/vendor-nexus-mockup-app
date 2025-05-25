@@ -6,6 +6,7 @@ import Layout from '../components/layout/Layout';
 import VendorDashboard from '../components/dashboard/VendorDashboard';
 import ProductManagement from '../components/products/ProductManagement';
 import VendorOnboarding from '../components/onboarding/VendorOnboarding';
+import Settings from '../components/settings/Settings';
 
 const Index = () => {
   const { user } = useAuth();
@@ -50,12 +51,7 @@ const Index = () => {
       case 'products':
         return <ProductManagement />;
       case 'settings':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold mb-4">Settings</h2>
-            <p className="text-muted-foreground">Coming soon - Configure your account preferences</p>
-          </div>
-        );
+        return <Settings />;
       default:
         return <VendorDashboard />;
     }

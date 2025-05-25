@@ -9,11 +9,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, Search, Eye, Edit, Trash2, Filter, Package } from 'lucide-react';
 import { Product, mockProducts, getStoredData, setStoredData, productCategories } from '../../services/mockData';
 import ProductForm from './ProductForm';
+import ProductDetailsModal from './ProductDetailsModal';
 
 const ProductManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>(getStoredData('products', mockProducts));
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [sortBy, setSortBy] = useState('newest');
@@ -200,16 +202,9 @@ const ProductManagement: React.FC = () => {
                 {filteredProducts.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded-lg"
-                        />
-                        <div>
-                          <div className="font-medium">{product.name}</div>
-                          <div className="text-sm text-muted-foreground">{product.subheading}</div>
-                        </div>
+                      <div>
+                        <div className="font-medium">{product.name}</div>
+                        <div className="text-sm text-muted-foreground">{product.subheading}</div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -249,7 +244,11 @@ const ProductManagement: React.FC = () => {
                     <TableCell>{new Date(product.uploadDate).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => setSelectedProduct(product)}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button 
@@ -278,6 +277,14 @@ const ProductManagement: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Product Details Modal */}
+      {selectedProduct && (
+        <ProductDetailsModal 
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 };
