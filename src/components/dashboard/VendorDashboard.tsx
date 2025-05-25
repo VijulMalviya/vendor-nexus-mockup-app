@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, CheckCircle, AlertCircle, Mail, TrendingUp, DollarSign, Users, ShoppingCart } from 'lucide-react';
+import { Package, CheckCircle, AlertCircle, Mail, TrendingUp, Users, ShieldCheck } from 'lucide-react';
 import { mockProducts, mockEnquiries, getStoredData } from '../../services/mockData';
 
 const VendorDashboard: React.FC = () => {
@@ -17,8 +16,6 @@ const VendorDashboard: React.FC = () => {
   const lowStockProducts = products.filter(p => p.stockStatus === 'low-stock').length;
 
   const newEnquiries = enquiries.filter(e => e.status === 'new').length;
-  const totalRevenue = products.reduce((sum, p) => sum + p.price, 0);
-  const avgProductPrice = totalProducts > 0 ? totalRevenue / totalProducts : 0;
 
   const kpiCards = [
     {
@@ -32,16 +29,6 @@ const VendorDashboard: React.FC = () => {
       description: 'Active listings'
     },
     {
-      title: 'Monthly Revenue',
-      value: `$${(totalRevenue * 0.1).toFixed(0)}`,
-      change: '+23%',
-      trend: 'up',
-      icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      description: 'This month'
-    },
-    {
       title: 'Active Enquiries',
       value: newEnquiries,
       change: '+8%',
@@ -52,14 +39,14 @@ const VendorDashboard: React.FC = () => {
       description: 'Pending responses'
     },
     {
-      title: 'Conversion Rate',
-      value: '3.2%',
-      change: '+0.5%',
+      title: 'Profile Status',
+      value: 'Verified',
+      change: '100%',
       trend: 'up',
-      icon: TrendingUp,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      description: 'Enquiry to sale'
+      icon: ShieldCheck,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      description: 'Profile complete'
     }
   ];
 
@@ -99,7 +86,7 @@ const VendorDashboard: React.FC = () => {
       </div>
 
       {/* Main KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {kpiCards.map((kpi, index) => (
           <Card key={index} className="hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
             <CardContent className="p-6">
@@ -148,31 +135,6 @@ const VendorDashboard: React.FC = () => {
                 </p>
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Profile Verification Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Verification</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Badge variant="default" className="bg-green-100 text-green-800">
-                  Verified
-                </Badge>
-                <span className="text-sm text-muted-foreground">
-                  Profile Complete
-                </span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Your vendor profile has been verified and is now active in the marketplace.
-              </p>
-            </div>
-            <Progress value={100} className="w-24" />
           </div>
         </CardContent>
       </Card>
