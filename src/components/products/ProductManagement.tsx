@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Search, Eye, Edit, Trash2, Filter } from 'lucide-react';
+import { Plus, Search, Eye, Edit, Trash2, Filter, Package } from 'lucide-react';
 import { Product, mockProducts, getStoredData, setStoredData, productCategories } from '../../services/mockData';
 import ProductForm from './ProductForm';
 
@@ -21,7 +21,7 @@ const ProductManagement: React.FC = () => {
     .filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            product.subheading.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = !categoryFilter || product.categories.includes(categoryFilter);
+      const matchesCategory = !categoryFilter || categoryFilter === 'all' || product.categories.includes(categoryFilter);
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
@@ -121,7 +121,7 @@ const ProductManagement: React.FC = () => {
                 <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {productCategories.map(category => (
                   <SelectItem key={category} value={category}>
                     {category}
