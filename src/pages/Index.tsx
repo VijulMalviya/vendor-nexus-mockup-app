@@ -7,6 +7,7 @@ import VendorDashboard from '../components/dashboard/VendorDashboard';
 import ProductManagement from '../components/products/ProductManagement';
 import VendorOnboarding from '../components/onboarding/VendorOnboarding';
 import Settings from '../components/settings/Settings';
+import BuyerDashboard from '../components/buyer/BuyerDashboard';
 
 const Index = () => {
   const { user } = useAuth();
@@ -20,19 +21,7 @@ const Index = () => {
   }
 
   if (user.userType === 'buyer') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold">Buyer Portal</h1>
-          <p className="text-lg text-muted-foreground">
-            Welcome {user.fullName}! The buyer interface is coming soon.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            This POC focuses on the vendor dashboard experience.
-          </p>
-        </div>
-      </div>
-    );
+    return <BuyerDashboard />;
   }
 
   // Show onboarding if vendor hasn't completed it

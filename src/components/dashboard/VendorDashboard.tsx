@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, CheckCircle, AlertCircle, Mail } from 'lucide-react';
+import { Package, CheckCircle, AlertCircle, Mail, TrendingUp, DollarSign, Users, ShoppingCart } from 'lucide-react';
 import { mockProducts, mockEnquiries, getStoredData } from '../../services/mockData';
 
 const VendorDashboard: React.FC = () => {
@@ -17,18 +17,57 @@ const VendorDashboard: React.FC = () => {
   const lowStockProducts = products.filter(p => p.stockStatus === 'low-stock').length;
 
   const newEnquiries = enquiries.filter(e => e.status === 'new').length;
+  const totalRevenue = products.reduce((sum, p) => sum + p.price, 0);
+  const avgProductPrice = totalProducts > 0 ? totalRevenue / totalProducts : 0;
 
   const kpiCards = [
     {
       title: 'Total Products',
       value: totalProducts,
+      change: '+12%',
+      trend: 'up',
       icon: Package,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
+      bgColor: 'bg-blue-50',
+      description: 'Active listings'
     },
+    {
+      title: 'Monthly Revenue',
+      value: `$${(totalRevenue * 0.1).toFixed(0)}`,
+      change: '+23%',
+      trend: 'up',
+      icon: DollarSign,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      description: 'This month'
+    },
+    {
+      title: 'Active Enquiries',
+      value: newEnquiries,
+      change: '+8%',
+      trend: 'up',
+      icon: Users,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
+      description: 'Pending responses'
+    },
+    {
+      title: 'Conversion Rate',
+      value: '3.2%',
+      change: '+0.5%',
+      trend: 'up',
+      icon: TrendingUp,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50',
+      description: 'Enquiry to sale'
+    }
+  ];
+
+  const stockCards = [
     {
       title: 'In Stock',
       value: inStockProducts,
+      percentage: totalProducts > 0 ? (inStockProducts / totalProducts) * 100 : 0,
       icon: CheckCircle,
       color: 'text-green-600',
       bgColor: 'bg-green-50'
@@ -36,6 +75,7 @@ const VendorDashboard: React.FC = () => {
     {
       title: 'Low Stock',
       value: lowStockProducts,
+      percentage: totalProducts > 0 ? (lowStockProducts / totalProducts) * 100 : 0,
       icon: AlertCircle,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-50'
@@ -43,6 +83,7 @@ const VendorDashboard: React.FC = () => {
     {
       title: 'Out of Stock',
       value: outOfStockProducts,
+      percentage: totalProducts > 0 ? (outOfStockProducts / totalProducts) * 100 : 0,
       icon: AlertCircle,
       color: 'text-red-600',
       bgColor: 'bg-red-50'
@@ -56,6 +97,60 @@ const VendorDashboard: React.FC = () => {
         <h1 className="text-2xl font-bold mb-2">Welcome back, John!</h1>
         <p className="text-blue-100">Here's what's happening with your marketplace today.</p>
       </div>
+
+      {/* Main KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {kpiCards.map((kpi, index) => (
+          <Card key={index} className="hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`p-3 rounded-full ${kpi.bgColor}`}>
+                  <kpi.icon className={`h-6 w-6 ${kpi.color}`} />
+                </div>
+                <div className={`flex items-center text-sm ${kpi.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                  {kpi.change}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">
+                  {kpi.title}
+                </p>
+                <p className="text-3xl font-bold mb-1">{kpi.value}</p>
+                <p className="text-xs text-muted-foreground">{kpi.description}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Stock Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Stock Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {stockCards.map((stock, index) => (
+              <div key={index} className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className={`p-2 rounded-full ${stock.bgColor}`}>
+                      <stock.icon className={`h-4 w-4 ${stock.color}`} />
+                    </div>
+                    <span className="font-medium">{stock.title}</span>
+                  </div>
+                  <span className="text-2xl font-bold">{stock.value}</span>
+                </div>
+                <Progress value={stock.percentage} className="h-2" />
+                <p className="text-xs text-muted-foreground">
+                  {stock.percentage.toFixed(1)}% of total products
+                </p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Profile Verification Status */}
       <Card>
@@ -81,27 +176,6 @@ const VendorDashboard: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {kpiCards.map((kpi, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {kpi.title}
-                  </p>
-                  <p className="text-2xl font-bold">{kpi.value}</p>
-                </div>
-                <div className={`p-3 rounded-full ${kpi.bgColor}`}>
-                  <kpi.icon className={`h-6 w-6 ${kpi.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
 
       {/* Recent Enquiries */}
       <Card>
